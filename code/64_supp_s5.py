@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 R = json.loads(Path(sys.argv[1]).read_text())
-LAB = [("F0_none", "F0: no context (component count only)"), ("F1_board_rows", "F1: + flagged rows on the board"),
+LAB = [("F0_none", "F0: component-level features only (no board or panel context)"), ("F1_board_rows", "F1: + flagged rows on the board"),
        ("F2_board_all", "F2: + flagged components and AOI classes on the board"),
        ("F3_panel", "F3: + flagged rows and boards on the panel"), ("F4_full", "F4: + same position flagged on sibling boards")]
 lines = ["## Table S5. Context-feature ablation, PHME", "",

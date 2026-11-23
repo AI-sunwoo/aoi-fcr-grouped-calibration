@@ -46,7 +46,7 @@ Python 3.12 with the versions in `requirements.txt` (numpy 2.3.5, pandas 2.3.3, 
 ## Split definitions
 
 - **PHME official**: training release → test release. **PHME temporal**: inspection date < 2019-08-01 (July) → ≥ 2019-08-01 (September).
-- **Siemens chronological (main analysis)**: rows in time order, cut at the calendar-day boundary closest to the row midpoint (row 226,622 of 440,274; development 64 days, 1,752 defects; evaluation 37 days, 2,870 defects; no shared day or timestamp group). Set `SIEMENS_SPLIT=day`. Without it the row midpoint is used (as in Pfab & Rothering, 2025), which shares one day and one timestamp group; it is used only to reproduce their protocol (Table S2).
+- **Siemens chronological (main analysis)**: rows in time order, cut at the calendar-day boundary closest to the row midpoint (row 226,622 of 440,274; development 64 days, 1,752 defects; evaluation 37 days, 2,870 defects; no shared day or timestamp group). Set `SIEMENS_SPLIT=day`. Without it the row midpoint is used (as in Pfab & Rothering, 2025), which shares one day and one timestamp group; it is used only to reproduce their protocol (Table S2) and for the Siemens BoardSet configuration search on the first 220,137 rows (`23_boardset_hpsearch.py siemens`, run without `SIEMENS_SPLIT`). The tuned GBDT is selected on the 226,622 development rows of the day-boundary split; both ranges precede the evaluation half.
 - **Siemens controls**: 20 random-board and 20 random-day halves, partition *i* drawn with `numpy.random.default_rng(5000+i)`.
 - **Rolling origins**: development on the first 36, 52, 68 or 84 days with data, evaluation on the next 16 days with data (last origin: to the end); `ROLL_GAP=7` shifts each evaluation window 7 recorded production days later.
 - **Cross-fitting folds**: row-wise folds use `StratifiedKFold(5, shuffle=True, random_state=seed)`; grouped folds use `StratifiedGroupKFold(5, shuffle=True, random_state=seed)` with timestamp group / panel (board-wise) or calendar date (day-blocked) as the group; seeds 0–2 (Siemens), 0–4 (PHME).
@@ -65,7 +65,7 @@ $P/10_build_tables.py $D $T
 
 # 1. Model configurations (development data only; copies of the selected ones are in configs/)
 $P/23_boardset_hpsearch.py phme    $T results/models
-$P/23_boardset_hpsearch.py siemens $T results/models
+$P/23_boardset_hpsearch.py siemens $T results/models   # row-midpoint development half (first 220,137 rows)
 $P/35_july_tuning.py $T results/cf 16     # July-only selection; also writes the July-configured PHME temporal BoardSet scores
 python -c "import json;json.dump(json.load(open('results/cf/boardset_cfg_phme_july.json'))['best'],open('results/v5_julyday/cfg_best.json','w'))"
 
