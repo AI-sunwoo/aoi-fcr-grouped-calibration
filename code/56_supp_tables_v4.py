@@ -62,6 +62,6 @@ for m in ["two_stage", "two_stage_dd", "lgb_base", "lgb_ctx", "lgb_agg", "boards
         d = MD.get(f"two_stage - {m}|{a}")
         def f(x, n):
             return f"{x:.{n}f}".replace("-", "−")
-        dv = f"{f(100 * d['d_vol'], 1)} ({f(100 * d['d_vol_ci'][0], 1)}, {f(100 * d['d_vol_ci'][1], 1)})" if d else "—"
-        ds = f"{f(100 * d['d_slip'], 2)} ({f(100 * d['d_slip_ci'][0], 2)}, {f(100 * d['d_slip_ci'][1], 2)})" if d else "—"
+        dv = f"{f(100 * d['d_vol'], 1)} ({f(100 * d['d_vol_ci'][0], 1)} to {f(100 * d['d_vol_ci'][1], 1)})" if d else "—"
+        ds = f"{f(100 * d['d_slip'], 2)} ({f(100 * d['d_slip_ci'][0], 2)} to {f(100 * d['d_slip_ci'][1], 2)})" if d else "—"
         print(f"| {MN[m] if a == 0.02 else ''} | {int(100 * a)}% | {100 * r['slip']:.1f} | {100 * r['vol']:.1f} | {dv} | {ds} |")

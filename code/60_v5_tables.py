@@ -22,7 +22,7 @@ print("One GBDT is trained per repetition; only the calibration sample changes. 
       "part divided by the target, mean over 20 repetitions; Exceed: repetitions above the target; Vol.: volume (%) at 5%. "
       "n < 99: repetitions whose pools held fewer than 99 defects, so that no call can pass at a 1% target (realized slip 0); "
       "Ratio @1% (n ≥ 99): mean over the other repetitions.\n")
-print("| Evaluation | Calibration sample | n (median) | n < 99 | Ratio @1% | @1% (n ≥ 99) | @2% | @5% | @10% | Exceed (1/2/5/10%) | Vol. @5% |")
+print("| Evaluation | Calibration sample | n (median) | n < 99 | Ratio @1% | @1% (n ≥ 99) | @2% | @5% | @10% | Exceed (1 / 2 / 5 / 10%) | Vol. @5% |")
 print("|---|---|---|---|---|---|---|---|---|---|---|")
 for kind, lab in [("chrono", "Chronological (day boundary)"), ("randday", "Random days (20 partitions)")]:
     f = V5 / f"fixed_model_{kind}.json"
@@ -55,7 +55,7 @@ if g7:
     print("Sensitivity of the rolling origins to shifting the evaluation window. Same development data, models and thresholds "
           "as Table S7; each evaluation window starts 7 production days with data after the end of development instead of "
           "immediately, so the evaluated boards differ and the last window shortens from 17 to 10 days. Met: origin–target "
-          "combinations (of 16) at or below the target; Ratio: realized slip / target, median [max].\n")
+          "combinations (of 16) at or below the target; Ratio: realized slip / target, median [maximum].\n")
     print("| Model | Folds | Met, no gap | Met, 7-day gap | Ratio, no gap | Ratio, 7-day gap |")
     print("|---|---|---|---|---|---|")
     rep["gap"] = {}

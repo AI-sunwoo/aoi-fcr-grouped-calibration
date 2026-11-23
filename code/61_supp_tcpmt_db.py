@@ -60,13 +60,13 @@ for k, v in P.items():
     m, g, rule, a = k.split("|")
     if rule != "pooled":
         continue
-    lines.append(f"| {NAME[m]} | {g} | {int(round(100 * float(a)))}% | {f(v['d_slip'])} ({f(v['d_slip_ci'][0])} to {f(v['d_slip_ci'][1])}) | "
+    lines.append(f"| {NAME[m]} | {g.replace('-', ' − ')} | {int(round(100 * float(a)))}% | {f(v['d_slip'])} ({f(v['d_slip_ci'][0])} to {f(v['d_slip_ci'][1])}) | "
                  f"{f(v['d_vol'])} ({f(v['d_vol_ci'][0])} to {f(v['d_vol_ci'][1])}) |")
 write("S4", "\n".join(lines))
 
 # ---------------- S13 (Table I, all data)
 lines = ["## Table S13. Grouping of the cross-fitting folds, all data", "",
-         "**Table S13.** Grouping of the cross-fitting folds and realized operating points, GBDT models, expected-slip rule. Dev. AP: "
+         "Grouping of the cross-fitting folds and realized operating points, GBDT models, expected-slip rule. Dev. AP: "
          "development AP within held-out folds. Eval. AP: AP on the evaluation data. Slip / volume: realized slip and volume (%) at "
          "target α. Means over seeds (Siemens 3, PHME 5); Siemens: day-boundary split, day-block intervals in Table S3.", "",
          "| Data, model | Folds | Dev. AP | Eval. AP | α = 1% | α = 2% | α = 5% | α = 10% |", "|---|---|---|---|---|---|---|---|"]
@@ -86,7 +86,7 @@ write("S13", "\n".join(lines))
 order = ["lgb_noctx", "lgb_ctx", "lgb_agg", "two_stage", "boardset_single", "boardset_noctx", "boardset_ctx", "boardsetj_noctx",
          "boardsetj_ctx", "lgbt_noctx", "lgbt_ctx", "two_stage_t"]
 lines = ["## Table S14. Average precision with standard deviations", "",
-         "**Table S14.** Average precision on the evaluation data, mean ± standard deviation over seeds (PHME 5, Siemens 3; tuned "
+         "Average precision on the evaluation data, mean ± standard deviation over seeds (PHME 5, Siemens 3; tuned "
          "models 3). Board-wise (PHME: panel-wise) cross-fitting. Siemens: day-boundary split; the tuned Siemens configuration "
          "was re-selected on its development half ("
          f"{TS['config']['best']['num_leaves']} leaves, at least {TS['config']['best']['min_child_samples']} samples per leaf, "
@@ -107,7 +107,7 @@ write("S14", "\n".join(lines))
 
 # ---------------- S15 (oracle and calibrated, board-wise)
 lines = ["## Table S15. Oracle and calibrated inspection-volume reduction", "",
-         "**Table S15.** Inspection-volume reduction (%) on the evaluation data. Oracle: threshold set on evaluation labels "
+         "Inspection-volume reduction (%) on the evaluation data. Oracle: threshold set on evaluation labels "
          "(seed-averaged scores). Calibrated: realized slip / volume (%) of the expected-slip rule with board-wise (PHME: "
          "panel-wise) folds, mean over seeds. Siemens: day-boundary split.", "",
          "| Data | Model | Oracle @1% | @2% | @5% | @10% | Calibrated α = 2% | Calibrated α = 5% |", "|---|---|---|---|---|---|---|---|"]
@@ -129,14 +129,14 @@ lines = ["## Table S16. Board escapes at matched volume, Siemens", "",
          f"Day-boundary split. Most defects sit on boards with several defects (87.7% of the {BW['n_def']:,} evaluation defects, on "
          f"{BW['n_def_boards']} defective boards). Thresholds are set on the evaluation labels so that each model passes 20%, 40% or "
          "60% of the false calls (seed-averaged scores). Slip: call slip (%); boards: defective boards whose defect calls were all "
-         "passed; Δ: difference in that rate from the GBDT without context (percentage points, 95% day-block interval).", "",
+         "passed; Δ: difference in the share of such boards from the GBDT without context (percentage points, 95% day-block interval).", "",
          "| Model | 20%: slip / boards | Δ | 40%: slip / boards | Δ | 60%: slip / boards | Δ |", "|---|---|---|---|---|---|---|"]
 for m in ["lgb_base", "lgb_ctx", "lgb_agg", "two_stage", "boardset_noctx", "boardset_ctx"]:
     cells = []
     for v in ["0.2", "0.4", "0.6"]:
         e = mv[m][v]
         cells.append(f"{pct(e['slip'])} / {e['esc_n']}")
-        cells.append("—" if "d_esc_vs_ref" not in e else f"{f(e['d_esc_vs_ref'])} ({f(e['d_esc_vs_ref_ci'][0])}, {f(e['d_esc_vs_ref_ci'][1])})")
+        cells.append("—" if "d_esc_vs_ref" not in e else f"{f(e['d_esc_vs_ref'])} ({f(e['d_esc_vs_ref_ci'][0])} to {f(e['d_esc_vs_ref_ci'][1])})")
     lines.append(f"| {NAME[m]} | " + " | ".join(cells) + " |")
 write("S16", "\n".join(lines))
 
