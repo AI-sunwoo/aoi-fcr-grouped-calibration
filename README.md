@@ -3,7 +3,7 @@
 Code, configurations and aggregated results for the paper
 
 > **Board- and Day-Level Dependence in Automated Optical Inspection False-Call Reduction: Grouped Calibration and Board-Context Models**
-> Sunwoo Lee, Hyeonbin Kim, and Su Young Kim — prepared for submission to *IEEE Transactions on Components, Packaging and Manufacturing Technology*.
+> Sunwoo Lee — prepared for submission to *IEEE Transactions on Components, Packaging and Manufacturing Technology*.
 
 False-call reduction (FCR) auto-passes low-risk AOI calls while limiting the share of true defects that slip through. On two public SMT datasets (PHME 2022 / Bitron and Siemens AOI), true defects cluster within boards, panels and production days. The study varies only how the folds of cross-fitted conformal slip thresholds are grouped (call, board, time window, day) and measures realized slip and the share of false calls auto-passed, together with a two-stage neighbor model and a set-transformer model (BoardSet) that use the other calls of a board.
 
