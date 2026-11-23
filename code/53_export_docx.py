@@ -54,4 +54,29 @@ h = OUT / (SRC.stem + ".html")
 h.write_text(page, encoding="utf-8")
 subprocess.run([sys.executable, SOFFICE, "--headless", "--convert-to", "docx:MS Word 2007 XML", "--outdir", str(OUT), str(h)],
                check=True)
-print("written", OUT / (SRC.stem + ".docx"))
+
+
+# 표 다듬기 (2026-11-23, 최종 점검 반영): LibreOffice가 표 칸 문단마다 14pt의 뒤 간격을 넣어, 표의 마지막 행 간격이
+# 다음 쪽으로 넘어가면 내용 없는 반복 머리행이 찍히고 행 하나가 두 쪽에 갈린다. 칸 문단 간격을 2pt로 줄이고
+# 모든 행에 '쪽에서 나누지 않음'(cantSplit)을 넣는다.
+def tidy_tables(xml):
+    def one(m):
+        t = re.sub(r'<w:spacing w:before="0" w:after="\d+"/>', '<w:spacing w:before="0" w:after="40"/>', m.group(0))
+        t = t.replace("<w:trPr>", "<w:trPr><w:cantSplit/>")
+        return re.sub(r"<w:tr>(?!<w:trPr>)", "<w:tr><w:trPr><w:cantSplit/></w:trPr>", t)
+    return re.sub(r"<w:tbl>.*?</w:tbl>", one, xml, flags=re.S)
+
+
+import shutil  # noqa: E402
+import zipfile  # noqa: E402
+
+docx = OUT / (SRC.stem + ".docx")
+tmp = docx.with_suffix(".tmp.docx")
+with zipfile.ZipFile(docx) as zi, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zo:
+    for it in zi.infolist():
+        data = zi.read(it.filename)
+        if it.filename == "word/document.xml":
+            data = tidy_tables(data.decode("utf-8")).encode("utf-8")
+        zo.writestr(it, data)
+shutil.move(tmp, docx)
+print("written", docx)

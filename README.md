@@ -41,7 +41,7 @@ fce397628226f43b21fe4b391196b609dc5723586c9e171ac607be42e206003c  phme/SPI_testi
 
 ## Environment
 
-Python 3.12 with the versions in `requirements.txt` (numpy 2.3.5, pandas 2.3.3, pyarrow, scikit-learn 1.9.1, LightGBM 4.7.0, SciPy 1.18.1, PyTorch 2.12.0, matplotlib). LightGBM runs with `deterministic=True, force_row_wise=True`. Results were produced on NVIDIA DGX Spark machines (GB10); BoardSet uses a GPU if available. Code comments are partly in Korean; the script index below summarizes each script.
+Python 3.12 with the versions in `requirements.txt` (numpy 2.3.5, pandas 2.3.3, pyarrow, scikit-learn 1.9.1, LightGBM 4.7.0, SciPy 1.18.1, PyTorch 2.12.0, matplotlib). LightGBM runs with `deterministic=True, force_row_wise=True`. Results were produced on NVIDIA DGX Spark machines (GB10). BoardSet training and configuration search (`22`, `23`, `31`, `35`) require a CUDA GPU (`device="cuda"` in `boardset.py`); `62_latency.py` uses a GPU only if one is available. Code comments are partly in Korean; the script index below summarizes each script.
 
 ## Split definitions
 
@@ -49,7 +49,7 @@ Python 3.12 with the versions in `requirements.txt` (numpy 2.3.5, pandas 2.3.3, 
 - **Siemens chronological (main analysis)**: rows in time order, cut at the calendar-day boundary closest to the row midpoint (row 226,622 of 440,274; development 64 days, 1,752 defects; evaluation 37 days, 2,870 defects; no shared day or timestamp group). Set `SIEMENS_SPLIT=day`. Without it the row midpoint is used (as in Pfab & Rothering, 2025), which shares one day and one timestamp group; it is used only to reproduce their protocol (Table S2).
 - **Siemens controls**: 20 random-board and 20 random-day halves, partition *i* drawn with `numpy.random.default_rng(5000+i)`.
 - **Rolling origins**: development on the first 36, 52, 68 or 84 days with data, evaluation on the next 16 days with data (last origin: to the end); `ROLL_GAP=7` shifts each evaluation window 7 recorded production days later.
-- **Cross-fitting folds**: `StratifiedGroupKFold(5, shuffle=True, random_state=seed)`, grouped by nothing (row-wise), timestamp group / panel (board-wise) or calendar date (day-blocked); seeds 0–2 (Siemens), 0–4 (PHME).
+- **Cross-fitting folds**: row-wise folds use `StratifiedKFold(5, shuffle=True, random_state=seed)`; grouped folds use `StratifiedGroupKFold(5, shuffle=True, random_state=seed)` with timestamp group / panel (board-wise) or calendar date (day-blocked) as the group; seeds 0–2 (Siemens), 0–4 (PHME).
 
 ## Reproduction
 
@@ -58,7 +58,7 @@ Run from the repository root with `P="python -I code"`, `T=tables`, `D=data`. Th
 ```bash
 # Output folders
 mkdir -p $T results/models results/cf results/cf_db results/v3 results/v4_db results/v5 results/v5_julyday \
-         results/controls results/analysis_v5/supp figures
+         results/controls results/crossfit results/analysis_v5/supp figures
 
 # 0. Tables
 $P/10_build_tables.py $D $T
@@ -77,6 +77,7 @@ $P/29_gbdt_tuned.py phme $T results/cf 3
 $P/31_dayblock_models.py phme $T results/cf 3 results/models/boardset_cfg_phme.json two_stage,boardset_ctx
 $P/31_dayblock_models.py phme $T results/v5_julyday 3 results/v5_julyday/cfg_best.json boardset_ctx
 $P/36_verified_crossfit.py $D $T results/v3 results/models/boardset_cfg_phme.json
+$P/25_phme_ctx_ablation.py $T results/crossfit          # context-feature ablation (Table S5)
 $P/40_phme_f1_official_inputs.py $T results/v5/phme_f1_official_inputs.json
 
 # 3. Siemens cross-fits, day-boundary split
@@ -105,7 +106,7 @@ $P/32_rolling_origin.py $T results/v3 lgb_base,lgb_ctx,two_stage 16
 ROLL_GAP=7 $P/32_rolling_origin.py $T results/v5 lgb_base,lgb_ctx 8
 $P/28_siemens_controls.py $T results/controls controls 3
 $P/28_siemens_controls.py $T results/controls pfab 3
-$P/62_latency.py $T results/v5/latency.json        # LAT_TRAIN_THREADS limits training threads on shared machines
+$P/62_latency.py $T results/v5/latency_arm.json    # run once per machine (latency_arm.json, latency_x86.json); LAT_TRAIN_THREADS limits training threads
 
 # 5. Analyses and supplement tables
 $P/48_analysis_v2.py results/cf_db results/controls results/analysis_v5/analysis_v2_db.json
@@ -116,6 +117,7 @@ $P/57_group_rules_summary.py results/v4_db results/analysis_v5/group_rules_summa
 $P/60_v5_tables.py results/v5 results/v3 results/analysis_v5/v5_summary.json
 $P/61_supp_tcpmt_db.py results/analysis_v5 results/analysis_v5/supp
 $P/56_supp_tables_v4.py results/analysis_v5/analysis_v4_db.json > results/analysis_v5/supp/S8S9.md
+$P/64_supp_s5.py results/crossfit/phme_ctx_ablation.json results/analysis_v5/supp/S5.md
 
 # 6. Figures (the last two arguments select the July-configured BoardSet for the PHME temporal panel of Fig. 4)
 $P/58_figs_ieee.py results/cf_db results/analysis_v5/analysis_v3_db.json results/analysis_v5/analysis_v4_db.json figures results/cf_db results/v5_julyday
@@ -132,9 +134,9 @@ $P/58_figs_ieee.py results/cf_db results/analysis_v5/analysis_v3_db.json results
 | `board_workload_db.json` | board-level measures (Table III, Table S17) |
 | `controls_repeat_*.json`, `rolling_origin_*.json` | Table II, Table S7, Table S20 |
 | `fixed_model_*.json`, `v5_summary.json` | Tables S19, S20 |
-| `latency*.json` | Section VI-D, Table S21 |
+| `latency_arm.json`, `latency_x86.json` | Section VI-D, Table S21 (DGX Spark Arm CPU and GB10 GPU; x86 workstation) |
 | `phme_f1_official_inputs.json` | Section S6 |
-| `supplement_tables/` | generated supplement tables |
+| `supplement_tables/` | generated supplement tables (S3–S5, S8, S9, S11, S13–S17, S19, S20) |
 
 `results/earlier_round/` holds the files behind Tables S1, S2, S5, S7 and S18 (`analysis_v2d.json`, `analysis_v3b.json`, `phme_ctx_ablation.json`).
 
@@ -147,16 +149,17 @@ $P/58_figs_ieee.py results/cf_db results/analysis_v5/analysis_v3_db.json results
 | `boardset.py` | BoardSet set transformer |
 | `phme_data.py`, `common.py` | PHME loading and features; slip/volume helpers |
 | `10_build_tables.py` | build the PHME component table and the Siemens call table (timestamp groups, context features) |
-| `22`, `23` | BoardSet cross-fits; BoardSet configuration search |
+| `22`, `23`, `25` | BoardSet cross-fits; BoardSet configuration search; PHME context-feature ablation |
 | `26`, `27`, `29`, `29b`, `31`, `34` | GBDT and two-stage cross-fits; day-blocked GBDT; tuned GBDT; day-blocked two-stage and BoardSet; group-aggregate GBDT |
 | `28`, `33` | Siemens control partitions and the Pfab–Rothering protocol; repeated controls |
 | `32` | rolling origins (and `ROLL_GAP`) |
 | `35`, `36`, `40_phme_f1_official_inputs` | July-only selection; repair-stage labels; challenge-rule F1 |
 | `37`, `38`, `39` | width of calibration groups and split-conformal variant; group-level rules; fixed-model calibration control |
 | `48`, `50`, `51`, `54`, `59` | analyses (AP, oracle, intervals; dependence statistics; realized slip; grouping sensitivity and model pairs; board measures) |
-| `56`, `57`, `60`, `61`, `63` | supplement tables; `63` summarizes the tuned Siemens GBDT runs |
+| `56`, `57`, `60`, `61`, `63`, `64` | supplement tables; `63` summarizes the tuned Siemens GBDT runs; `64` builds Table S5 |
+| `53` | supplement export (Markdown to Word via LibreOffice) |
 | `58`, `47`, `62` | figures for the IEEE version; Fig. 1 schematic (earlier version); inference latency |
-| others (`00`–`25` not listed, `40_analyze`, `41`–`46`, `49`, `52`, `53`, `55`) | earlier exploratory rounds and an extended manuscript; not needed for the reported results |
+| others (`00`–`25` not listed, `40_analyze`, `41`–`46`, `49`, `52`, `55`) | earlier exploratory rounds and an extended manuscript; not needed for the reported results |
 
 ## License and citation
 
