@@ -41,12 +41,12 @@ for kind, gs in d.items():
 Path(OUT).write_text(json.dumps(summ, indent=1), encoding="utf-8")
 
 print("## Table S11. Group-level calibration rules, Siemens data, GBDT without context\n")
-print("Same partitions and cross-fits as Table 3 (one seed per partition) and the chronological halves (one seed). Rules "
-      "(Section 4.3): expected-slip rule counting defects (main rule), group-weighted rule (every calibration group with "
+print("Same partitions and cross-fits as Table II of the main paper (one seed per partition) and the chronological halves (one seed). Rules "
+      "(Section IV-B of the main paper): expected-slip rule counting defects (main rule), group-weighted rule (every calibration group with "
       "held-out defects counts once) and group-bootstrap rule (95th percentile of the p-value over 1,000 resamples of the "
       "groups). Groups: mean number of calibration groups with held-out defects (boards for board-wise, days for "
-      "day-blocked folds). Ratio: realised slip divided by the target, mean over partitions. Exceed: partitions whose "
-      "realised slip exceeded the target at 1 / 2 / 5 / 10%. Vol.: inspection-volume reduction (%), mean over "
+      "day-blocked folds). Ratio: realized slip divided by the target, mean over partitions. Exceed: partitions whose "
+      "realized slip exceeded the target at 1 / 2 / 5 / 10%. Vol.: inspection-volume reduction (%), mean over "
       "partitions.\n")
 print("| Split | Folds (groups) | Rule | Ratio @1% | @2% | @5% | @10% | Exceed | Vol. @2% | Vol. @5% |")
 print("|---|---|---|---|---|---|---|---|---|---|")

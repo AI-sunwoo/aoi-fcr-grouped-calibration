@@ -3,7 +3,7 @@
 Code, configurations and aggregated results for the paper
 
 > **Board- and Day-Level Dependence in Automated Optical Inspection False-Call Reduction: Grouped Calibration and Board-Context Models**
-> Sunwoo Lee, Hyeonbin Kim, and Su Young Kim — submitted to *IEEE Transactions on Components, Packaging and Manufacturing Technology* (under review).
+> Sunwoo Lee, Hyeonbin Kim, and Su Young Kim — prepared for submission to *IEEE Transactions on Components, Packaging and Manufacturing Technology*.
 
 False-call reduction (FCR) auto-passes low-risk AOI calls while limiting the share of true defects that slip through. On two public SMT datasets (PHME 2022 / Bitron and Siemens AOI), true defects cluster within boards, panels and production days. The study varies only how the folds of cross-fitted conformal slip thresholds are grouped (call, board, time window, day) and measures realized slip and the share of false calls auto-passed, together with a two-stage neighbor model and a set-transformer model (BoardSet) that use the other calls of a board.
 
@@ -56,14 +56,18 @@ Python 3.12 with the versions in `requirements.txt` (numpy 2.3.5, pandas 2.3.3, 
 Run from the repository root with `P="python -I code"`, `T=tables`, `D=data`. The sequence below is complete but has not yet been run end to end in a fresh environment.
 
 ```bash
+# Output folders
+mkdir -p $T results/models results/cf results/cf_db results/v3 results/v4_db results/v5 results/v5_julyday \
+         results/controls results/analysis_v5/supp figures
+
 # 0. Tables
 $P/10_build_tables.py $D $T
 
 # 1. Model configurations (development data only; copies of the selected ones are in configs/)
 $P/23_boardset_hpsearch.py phme    $T results/models
 $P/23_boardset_hpsearch.py siemens $T results/models
-$P/35_july_tuning.py $T results/v3 16
-python -c "import json;json.dump(json.load(open('results/v3/boardset_cfg_phme_july.json'))['best'],open('results/v5_julyday/cfg_best.json','w'))"
+$P/35_july_tuning.py $T results/cf 16     # July-only selection; also writes the July-configured PHME temporal BoardSet scores
+python -c "import json;json.dump(json.load(open('results/cf/boardset_cfg_phme_july.json'))['best'],open('results/v5_julyday/cfg_best.json','w'))"
 
 # 2. PHME cross-fits
 $P/26_crossfit.py phme $T results/cf 5
@@ -83,6 +87,7 @@ $P/34_siemens_groupagg.py $T results/cf_db 3 16
 $P/22_boardset.py siemens $T results/cf_db 3 ctx,noctx,single results/models/boardset_cfg_siemens.json
 $P/31_dayblock_models.py siemens $T results/cf_db 3 results/models/boardset_cfg_siemens.json two_stage,two_stage_dd,boardset_ctx,boardset_noctx
 $P/29_gbdt_tuned.py siemens $T results/cf_db 3
+$P/63_tuned_siemens_summary.py $T results/cf_db results/analysis_v5/tuned_siemens_db.json
 for f in results/cf/phme_*; do ln -sf ../cf/$(basename $f) results/cf_db/; done
 unset SIEMENS_SPLIT
 
@@ -107,10 +112,10 @@ $P/48_analysis_v2.py results/cf_db results/controls results/analysis_v5/analysis
 $P/51_analysis_v3.py results/cf_db results/v3 results/analysis_v5/analysis_v3_db.json
 $P/54_analysis_v4.py results/cf_db results/v3 results/v4_db $T results/analysis_v5/analysis_v4_db.json
 $P/59_board_workload.py results/cf_db results/analysis_v5/board_workload_db.json
-$P/57_group_rules_summary.py results/v4_db results/analysis_v5/group_rules_summary_db.json
+$P/57_group_rules_summary.py results/v4_db results/analysis_v5/group_rules_summary_db.json > results/analysis_v5/supp/S11.md
 $P/60_v5_tables.py results/v5 results/v3 results/analysis_v5/v5_summary.json
 $P/61_supp_tcpmt_db.py results/analysis_v5 results/analysis_v5/supp
-$P/56_supp_tables_v4.py results/analysis_v5/analysis_v4_db.json
+$P/56_supp_tables_v4.py results/analysis_v5/analysis_v4_db.json > results/analysis_v5/supp/S8S9.md
 
 # 6. Figures (the last two arguments select the July-configured BoardSet for the PHME temporal panel of Fig. 4)
 $P/58_figs_ieee.py results/cf_db results/analysis_v5/analysis_v3_db.json results/analysis_v5/analysis_v4_db.json figures results/cf_db results/v5_julyday
@@ -121,6 +126,7 @@ $P/58_figs_ieee.py results/cf_db results/analysis_v5/analysis_v3_db.json results
 | File (`results/main/`) | Used for |
 |---|---|
 | `analysis_v2_db.json` | Tables I and III (AP, oracle volume), Tables S13–S15, model-difference intervals |
+| `tuned_siemens_db.json` | tuned GBDT on the Siemens day-boundary split: selected configuration and evaluation AP per seed (Section VI-C, tuned Siemens rows of Table S14) |
 | `analysis_v3_db.json` | realized slip with day-block intervals, Fig. 2, Tables S3, S4, S16 |
 | `analysis_v4_db.json`, `partitions/` | Fig. 3, Tables S8, S9, S11 (per-partition grouping widths and group rules) |
 | `board_workload_db.json` | board-level measures (Table III, Table S17) |
@@ -148,7 +154,7 @@ $P/58_figs_ieee.py results/cf_db results/analysis_v5/analysis_v3_db.json results
 | `35`, `36`, `40_phme_f1_official_inputs` | July-only selection; repair-stage labels; challenge-rule F1 |
 | `37`, `38`, `39` | width of calibration groups and split-conformal variant; group-level rules; fixed-model calibration control |
 | `48`, `50`, `51`, `54`, `59` | analyses (AP, oracle, intervals; dependence statistics; realized slip; grouping sensitivity and model pairs; board measures) |
-| `56`, `57`, `60`, `61` | supplement tables |
+| `56`, `57`, `60`, `61`, `63` | supplement tables; `63` summarizes the tuned Siemens GBDT runs |
 | `58`, `47`, `62` | figures for the IEEE version; Fig. 1 schematic (earlier version); inference latency |
 | others (`00`–`25` not listed, `40_analyze`, `41`–`46`, `49`, `52`, `53`, `55`) | earlier exploratory rounds and an extended manuscript; not needed for the reported results |
 

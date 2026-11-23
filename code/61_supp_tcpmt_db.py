@@ -1,6 +1,7 @@
 """TCPMT 보충자료 표 S3·S4·S13~S17을 날짜 경계 분할 결과로 다시 만든다 (2026-11-23, 모의 심사 1번 반영).
 
-입력: analysis_v2_db.json(48번), analysis_v3_db.json(51번), board_workload_db.json(59번) — 모두 results/analysis_v5/.
+입력: analysis_v2_db.json(48번), analysis_v3_db.json(51번), board_workload_db.json(59번), tuned_siemens_db.json(63번)
+— 모두 results/analysis_v5/.
 출력: 표별 Markdown 조각을 <출력 폴더>/S*.md로 쓴다.
 
 사용: python3 -I 61_supp_tcpmt_db.py <analysis_v5 폴더> <출력 폴더>
@@ -14,6 +15,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 A2 = json.loads((SRC / "analysis_v2_db.json").read_text())
 A3 = json.loads((SRC / "analysis_v3_db.json").read_text())
 BW = json.loads((SRC / "board_workload_db.json").read_text())
+TS = json.loads((SRC / "tuned_siemens_db.json").read_text())   # 조율 Siemens GBDT (날짜 경계 분할), 63번
 AL = [0.01, 0.02, 0.05, 0.1]
 NAME = {"lgb_base": "GBDT, no context", "lgb_noctx": "GBDT, no context", "lgb_ctx": "GBDT + context",
         "lgb_agg": "GBDT + full group aggregates", "two_stage": "Two-stage neighbor", "two_stage_dd": "Two-stage, day-blocked inner folds",
@@ -85,14 +87,18 @@ order = ["lgb_noctx", "lgb_ctx", "lgb_agg", "two_stage", "boardset_single", "boa
          "boardsetj_ctx", "lgbt_noctx", "lgbt_ctx", "two_stage_t"]
 lines = ["## Table S14. Average precision with standard deviations", "",
          "**Table S14.** Average precision on the evaluation data, mean ± standard deviation over seeds (PHME 5, Siemens 3; tuned "
-         "models 3). Board-wise (PHME: panel-wise) cross-fitting. Siemens: day-boundary split; the tuned Siemens models were run "
-         "only on the row-midpoint split (AP 0.360, 0.354 and 0.370 for the tuned GBDT without and with context and the tuned "
-         "two-stage model) and are shown as —.", "", "| Model | PHME official | PHME temporal | Siemens |", "|---|---|---|---|"]
+         "models 3). Board-wise (PHME: panel-wise) cross-fitting. Siemens: day-boundary split; the tuned Siemens configuration "
+         "was re-selected on its development half ("
+         f"{TS['config']['best']['num_leaves']} leaves, at least {TS['config']['best']['min_child_samples']} samples per leaf, "
+         f"{'square-root' if TS['config']['best']['spw'] == 'sqrt' else 'full'} class weight).", "",
+         "| Model | PHME official | PHME temporal | Siemens |", "|---|---|---|---|"]
 for m in order:
     cells = []
     for ds, split in [("phme", "official"), ("phme", "temporal"), ("siemens", "eval")]:
         key = {"lgb_noctx": "lgb_base", "lgbt_noctx": "lgbt_base"}.get(m, m) if ds == "siemens" else m
         e = A2[ds][split]["models"].get(key)
+        if ds == "siemens" and key in TS["models"]:
+            e = TS["models"][key]
         cells.append(f"{e['eval_ap'][0]:.3f} ± {e['eval_ap'][1]:.3f}" if e else "—")
     if all(c == "—" for c in cells):
         continue

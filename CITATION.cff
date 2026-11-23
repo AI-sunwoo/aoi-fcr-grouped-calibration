@@ -11,7 +11,7 @@ authors:
   - family-names: Kim
     given-names: Su Young
 preferred-citation:
-  type: article
+  type: unpublished
   title: "Board- and Day-Level Dependence in Automated Optical Inspection False-Call Reduction: Grouped Calibration and Board-Context Models"
   authors:
     - family-names: Lee
@@ -20,6 +20,5 @@ preferred-citation:
       given-names: Hyeonbin
     - family-names: Kim
       given-names: Su Young
-  journal: "IEEE Transactions on Components, Packaging and Manufacturing Technology"
-  notes: "Under review"
+  notes: "Prepared for submission to IEEE Transactions on Components, Packaging and Manufacturing Technology"
   year: 2026
