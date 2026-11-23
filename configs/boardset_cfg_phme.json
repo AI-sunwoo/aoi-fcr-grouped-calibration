@@ -1,0 +1,1 @@
+{"max_epochs": 80, "patience": 12, "val_frac": 0.15, "lr": 0.001, "pw": "sqrt", "d": 128, "layers": 2, "dropout": 0.3, "n_init": 3}

@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper."
+title: "aoi-fcr-grouped-calibration"
+license: MIT
+repository-code: "https://github.com/AI-sunwoo/aoi-fcr-grouped-calibration"
+authors:
+  - family-names: Lee
+    given-names: Sunwoo
+  - family-names: Kim
+    given-names: Hyeonbin
+  - family-names: Kim
+    given-names: Su Young
+preferred-citation:
+  type: article
+  title: "Board- and Day-Level Dependence in Automated Optical Inspection False-Call Reduction: Grouped Calibration and Board-Context Models"
+  authors:
+    - family-names: Lee
+      given-names: Sunwoo
+    - family-names: Kim
+      given-names: Hyeonbin
+    - family-names: Kim
+      given-names: Su Young
+  journal: "IEEE Transactions on Components, Packaging and Manufacturing Technology"
+  notes: "Under review"
+  year: 2026

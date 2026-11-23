@@ -1,0 +1,46 @@
+{
+ "cpu": "Model name:                              AMD Ryzen 9 9950X3D 16-Core Processor",
+ "machine": "x86_64",
+ "gpu": "NVIDIA RTX PRO 6000 Blackwell Workstation Edition",
+ "threads_cpu": 1,
+ "boards_timed": 1000,
+ "largest_board_calls": 557,
+ "median_board_calls": 7.0,
+ "summary": {
+  "gbdt_base": {
+   "mean_ms": 6.788263590075076,
+   "median_ms": 6.091856514103711,
+   "p95_ms": 9.885932382894678,
+   "max_ms": 18.276064074598253,
+   "largest_board_ms": 57.15999100357294
+  },
+  "gbdt_ctx": {
+   "mean_ms": 6.45155643473845,
+   "median_ms": 5.884950514882803,
+   "p95_ms": 9.348285425221539,
+   "max_ms": 14.483242994174361,
+   "largest_board_ms": 28.92485202755779
+  },
+  "two_stage": {
+   "mean_ms": 12.707340247114189,
+   "median_ms": 11.797828483395278,
+   "p95_ms": 17.290385375963524,
+   "max_ms": 26.016196934506297,
+   "largest_board_ms": 61.70620408374816
+  },
+  "boardset_cpu": {
+   "mean_ms": 4.100559437647462,
+   "median_ms": 3.7184504326432943,
+   "p95_ms": 6.5474724804516855,
+   "max_ms": 21.771074971184134,
+   "largest_board_ms": 199.30719397962093
+  },
+  "boardset_gpu": {
+   "mean_ms": 5.131648667622358,
+   "median_ms": 5.024942045565695,
+   "p95_ms": 5.600870051421225,
+   "max_ms": 23.001484922133386,
+   "largest_board_ms": 10.370560106821358
+  }
+ }
+}

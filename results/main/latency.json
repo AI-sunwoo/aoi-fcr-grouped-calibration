@@ -1,0 +1,46 @@
+{
+ "cpu": "",
+ "machine": "aarch64",
+ "gpu": "NVIDIA GB10",
+ "threads_cpu": 1,
+ "boards_timed": 1000,
+ "largest_board_calls": 557,
+ "median_board_calls": 7.0,
+ "summary": {
+  "gbdt_base": {
+   "mean_ms": 6.582941248547286,
+   "median_ms": 5.946901044808328,
+   "p95_ms": 9.49991450179368,
+   "max_ms": 17.303429078310728,
+   "largest_board_ms": 53.932008100673556
+  },
+  "gbdt_ctx": {
+   "mean_ms": 6.341224298346788,
+   "median_ms": 5.811700480990112,
+   "p95_ms": 9.072778245899826,
+   "max_ms": 13.634972972795367,
+   "largest_board_ms": 28.083517914637923
+  },
+  "two_stage": {
+   "mean_ms": 12.721178792184219,
+   "median_ms": 11.915904469788074,
+   "p95_ms": 16.956595366355025,
+   "max_ms": 56.30396190099418,
+   "largest_board_ms": 57.73737607523799
+  },
+  "boardset_cpu": {
+   "mean_ms": 23.975277199875563,
+   "median_ms": 12.679901090450585,
+   "p95_ms": 78.02221556194124,
+   "max_ms": 138.72781302779913,
+   "largest_board_ms": 270.43100888840854
+  },
+  "boardset_gpu": {
+   "mean_ms": 5.570421078708023,
+   "median_ms": 5.430339486338198,
+   "p95_ms": 6.031758687458932,
+   "max_ms": 22.91870303452015,
+   "largest_board_ms": 10.294263018295169
+  }
+ }
+}

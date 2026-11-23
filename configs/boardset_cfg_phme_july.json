@@ -1,0 +1,119 @@
+{
+ "best": {
+  "max_epochs": 80,
+  "patience": 12,
+  "val_frac": 0.15,
+  "lr": 0.001,
+  "pw": "sqrt",
+  "d": 64,
+  "layers": 1,
+  "dropout": 0.3,
+  "n_init": 3
+ },
+ "grid": [
+  {
+   "cfg": {
+    "max_epochs": 80,
+    "patience": 12,
+    "val_frac": 0.15,
+    "lr": 0.001,
+    "pw": "sqrt",
+    "d": 64,
+    "layers": 1,
+    "dropout": 0.1
+   },
+   "oof_ap": 0.6084720364374546
+  },
+  {
+   "cfg": {
+    "max_epochs": 80,
+    "patience": 12,
+    "val_frac": 0.15,
+    "lr": 0.001,
+    "pw": "sqrt",
+    "d": 64,
+    "layers": 1,
+    "dropout": 0.3
+   },
+   "oof_ap": 0.6143148853497178
+  },
+  {
+   "cfg": {
+    "max_epochs": 80,
+    "patience": 12,
+    "val_frac": 0.15,
+    "lr": 0.001,
+    "pw": "sqrt",
+    "d": 64,
+    "layers": 2,
+    "dropout": 0.1
+   },
+   "oof_ap": 0.5733036157049475
+  },
+  {
+   "cfg": {
+    "max_epochs": 80,
+    "patience": 12,
+    "val_frac": 0.15,
+    "lr": 0.001,
+    "pw": "sqrt",
+    "d": 64,
+    "layers": 2,
+    "dropout": 0.3
+   },
+   "oof_ap": 0.5836258843843651
+  },
+  {
+   "cfg": {
+    "max_epochs": 80,
+    "patience": 12,
+    "val_frac": 0.15,
+    "lr": 0.001,
+    "pw": "sqrt",
+    "d": 128,
+    "layers": 1,
+    "dropout": 0.1
+   },
+   "oof_ap": 0.5672864447301782
+  },
+  {
+   "cfg": {
+    "max_epochs": 80,
+    "patience": 12,
+    "val_frac": 0.15,
+    "lr": 0.001,
+    "pw": "sqrt",
+    "d": 128,
+    "layers": 1,
+    "dropout": 0.3
+   },
+   "oof_ap": 0.5997696103360874
+  },
+  {
+   "cfg": {
+    "max_epochs": 80,
+    "patience": 12,
+    "val_frac": 0.15,
+    "lr": 0.001,
+    "pw": "sqrt",
+    "d": 128,
+    "layers": 2,
+    "dropout": 0.1
+   },
+   "oof_ap": 0.5573021413697321
+  },
+  {
+   "cfg": {
+    "max_epochs": 80,
+    "patience": 12,
+    "val_frac": 0.15,
+    "lr": 0.001,
+    "pw": "sqrt",
+    "d": 128,
+    "layers": 2,
+    "dropout": 0.3
+   },
+   "oof_ap": 0.5697718413248801
+  }
+ ]
+}

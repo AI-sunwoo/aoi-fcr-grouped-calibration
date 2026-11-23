@@ -1,0 +1,18 @@
+# Raw and derived data are not redistributed
+data/
+tables/
+*.parquet
+*.csv
+*.csv.zip
+*.npz
+# Working folders created by the pipeline (only the aggregated results under results/main and results/earlier_round are tracked)
+results/*
+!results/main/
+!results/earlier_round/
+figures/
+# Python and OS clutter
+__pycache__/
+*.pyc
+.DS_Store
+.claude/
+*.log
